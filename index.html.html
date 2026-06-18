@@ -1,0 +1,1948 @@
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Unified Timesheet Platform — Jira × Zoho</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+  href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap"
+  rel="stylesheet">
+
+<style>
+  :root {
+    --ink: #0F1320;
+    --ink-2: #283044;
+    --muted: #6B7486;
+    --line: #E4E8EF;
+    --paper: #EEF0F5;
+    --surface: #FFFFFF;
+    --surface-2: #F6F8FB;
+    --brand: #5A45F0;
+    --brand-ink: #3826C2;
+    --brand-soft: #ECE9FE;
+    --jira: #2684FF;
+    --jira-ink: #0747A6;
+    --jira-soft: #E4F0FF;
+    --zoho: #E42527;
+    --zoho-ink: #A0181A;
+    --zoho-soft: #FDEAEA;
+    --dev: #5A45F0;
+    --tl: #0C9C8E;
+    --tl-soft: #DDF5F1;
+    --rm: #D9760B;
+    --rm-soft: #FBEEDB;
+    --ok: #159D55;
+    --ok-soft: #E0F5E9;
+    --warn: #D9760B;
+    --warn-soft: #FBEEDB;
+    --no: #D6373B;
+    --no-soft: #FCE7E8;
+    --r: 15px;
+    --r-sm: 10px;
+    --shadow: 0 1px 2px rgba(15, 19, 32, .04), 0 10px 28px rgba(15, 19, 32, .07);
+    --shadow-lg: 0 16px 50px rgba(15, 19, 32, .16);
+  }
+
+  * {
+    box-sizing: border-box
+  }
+
+  html,
+  body {
+    margin: 0;
+    height: 100%
+  }
+
+  body {
+    font-family: "Inter", system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--paper);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased
+  }
+
+  .mono {
+    font-family: "JetBrains Mono", ui-monospace, monospace
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: "Space Grotesk", sans-serif;
+    margin: 0;
+    letter-spacing: -.015em
+  }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    background: none
+  }
+
+  input,
+  select,
+  textarea {
+    font-family: inherit;
+    font-size: 14px
+  }
+
+  .hidden {
+    display: none !important
+  }
+
+  .btn {
+    padding: 11px 18px;
+    border-radius: var(--r-sm);
+    font-weight: 600;
+    font-size: 14px;
+    transition: .15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center
+  }
+
+  .btn-primary {
+    background: var(--brand);
+    color: #fff
+  }
+
+  .btn-primary:hover {
+    background: var(--brand-ink)
+  }
+
+  .btn-ghost {
+    background: var(--surface-2);
+    color: var(--ink);
+    border: 1px solid var(--line)
+  }
+
+  .btn-ghost:hover {
+    background: #fff;
+    border-color: #cfd6dd
+  }
+
+  .btn:disabled {
+    opacity: .5;
+    cursor: not-allowed
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 11.5px;
+    font-weight: 600
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg)
+    }
+  }
+
+  .spin {
+    animation: spin .8s linear infinite
+  }
+
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px)
+    }
+
+    to {
+      opacity: 1;
+      transform: none
+    }
+  }
+
+  @keyframes pulse {
+
+    0%,
+    100% {
+      opacity: 1
+    }
+
+    50% {
+      opacity: .35
+    }
+  }
+
+  @keyframes ring {
+    0% {
+      box-shadow: 0 0 0 0 rgba(90, 69, 240, .4)
+    }
+
+    100% {
+      box-shadow: 0 0 0 8px rgba(90, 69, 240, 0)
+    }
+  }
+
+  /* ===== AUTH ===== */
+  #login-view,
+  #connect-view {
+    min-height: 100%;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: radial-gradient(900px 520px at 10% -8%, #ECE9FE 0%, transparent 56%),
+      radial-gradient(820px 520px at 108% 112%, #E4F0FF 0%, transparent 55%), var(--paper)
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 440px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    padding: 38px 34px;
+    box-shadow: var(--shadow-lg);
+    animation: fadeUp .5s ease both
+  }
+
+  .brand-mark {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 24px
+  }
+
+  .logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--brand), #8576F5);
+    display: grid;
+    place-items: center;
+    color: #fff;
+    flex: none;
+    box-shadow: 0 8px 18px rgba(90, 69, 240, .36)
+  }
+
+  .logo svg {
+    width: 22px;
+    height: 22px
+  }
+
+  .brand-name {
+    font-family: "Space Grotesk";
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: -.02em
+  }
+
+  .brand-sub {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 500
+  }
+
+  .auth-card h1 {
+    font-size: 25px;
+    margin-bottom: 6px
+  }
+
+  .auth-card .lede {
+    color: var(--muted);
+    margin-bottom: 22px;
+    font-size: 13.5px
+  }
+
+  .field {
+    margin-bottom: 14px
+  }
+
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-2);
+    margin-bottom: 6px
+  }
+
+  .field input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--surface-2);
+    transition: .15s
+  }
+
+  .field input:focus {
+    outline: none;
+    border-color: var(--brand);
+    background: #fff;
+    box-shadow: 0 0 0 3px var(--brand-soft)
+  }
+
+  .idp-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 13px;
+    background: var(--surface-2);
+    border: 1px dashed var(--line);
+    border-radius: var(--r-sm);
+    font-size: 12px;
+    color: var(--muted)
+  }
+
+  .or {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--muted);
+    font-size: 11px;
+    margin: 18px 0 12px;
+    font-weight: 600;
+    letter-spacing: .08em
+  }
+
+  .or::before,
+  .or::after {
+    content: "";
+    height: 1px;
+    background: var(--line);
+    flex: 1
+  }
+
+  .sso-status {
+    font-size: 12.5px;
+    color: var(--brand-ink);
+    background: var(--brand-soft);
+    border-radius: var(--r-sm);
+    padding: 11px 13px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 14px
+  }
+
+  .who {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: .04em;
+    margin-bottom: 8px
+  }
+
+  .who-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px
+  }
+
+  .who-btn {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 11px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--surface-2);
+    text-align: left;
+    transition: .15s
+  }
+
+  .who-btn:hover {
+    background: #fff;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px var(--brand-soft)
+  }
+
+  .who-btn .avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+    border-radius: 8px
+  }
+
+  .who-btn .nm {
+    font-size: 12.5px;
+    font-weight: 600;
+    line-height: 1.15
+  }
+
+  .who-btn .rl {
+    font-size: 10.5px;
+    color: var(--muted)
+  }
+
+  /* ===== auto-connect ===== */
+  .connect-card {
+    max-width: 520px
+  }
+
+  .conn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 15px;
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    background: var(--surface-2);
+    transition: .25s;
+    margin-bottom: 12px
+  }
+
+  .conn.done {
+    background: #fff;
+    border-color: var(--ok)
+  }
+
+  .conn-ic {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    flex: none;
+    font-family: "Space Grotesk";
+    font-weight: 700;
+    color: #fff;
+    font-size: 18px
+  }
+
+  .conn-ic.j {
+    background: var(--jira)
+  }
+
+  .conn-ic.z {
+    background: var(--zoho)
+  }
+
+  .conn-meta {
+    flex: 1;
+    min-width: 0
+  }
+
+  .conn-meta strong {
+    display: block;
+    font-family: "Space Grotesk";
+    font-size: 15px
+  }
+
+  .conn-meta span {
+    font-size: 12px;
+    color: var(--muted)
+  }
+
+  .conn-scopes {
+    font-size: 10.5px;
+    color: var(--muted);
+    margin-top: 3px
+  }
+
+  .conn-state {
+    flex: none
+  }
+
+  .link {
+    color: var(--brand);
+    font-weight: 600;
+    font-size: 12px;
+    background: none
+  }
+
+  .link:hover {
+    text-decoration: underline
+  }
+
+  /* ===== APP SHELL ===== */
+  #app-view {
+    display: grid;
+    grid-template-columns: 248px 1fr;
+    min-height: 100%
+  }
+
+  .sidebar {
+    background: var(--ink);
+    color: #cdd3df;
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    position: sticky;
+    top: 0;
+    height: 100vh
+  }
+
+  .sidebar .brand-mark {
+    margin-bottom: 20px
+  }
+
+  .sidebar .brand-name {
+    color: #fff
+  }
+
+  .sidebar .brand-sub {
+    color: #7b8499
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px 12px;
+    border-radius: var(--r-sm);
+    color: #a9b1c0;
+    font-weight: 500;
+    font-size: 13.5px;
+    transition: .15s;
+    width: 100%;
+    text-align: left
+  }
+
+  .nav-item svg {
+    width: 17px;
+    height: 17px;
+    flex: none;
+    opacity: .85
+  }
+
+  .nav-item:hover {
+    background: #1b2230;
+    color: #fff
+  }
+
+  .nav-item.active {
+    background: var(--brand);
+    color: #fff
+  }
+
+  .nav-item .badge {
+    margin-left: auto;
+    background: #fff;
+    color: var(--brand);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 100px
+  }
+
+  .nav-sep {
+    height: 1px;
+    background: #212a3a;
+    margin: 9px 4px
+  }
+
+  .role-tag {
+    margin: 4px 4px 10px;
+    padding: 8px 11px;
+    border-radius: var(--r-sm);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    display: flex;
+    align-items: center;
+    gap: 8px
+  }
+
+  .side-user {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: var(--r-sm);
+    background: #181f2c
+  }
+
+  .avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    flex: none;
+    font-family: "Space Grotesk"
+  }
+
+  .side-user .nm {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.2
+  }
+
+  .side-user .em {
+    font-size: 10.5px;
+    color: #7b8499
+  }
+
+  .main {
+    overflow: hidden
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 30px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    position: sticky;
+    top: 0;
+    z-index: 6
+  }
+
+  .topbar h2 {
+    font-size: 18px
+  }
+
+  .topbar .sub {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500
+  }
+
+  .seg {
+    display: flex;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    padding: 3px;
+    margin-left: auto
+  }
+
+  .seg button {
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    transition: .15s
+  }
+
+  .seg button.on {
+    background: #fff;
+    color: var(--ink);
+    box-shadow: var(--shadow)
+  }
+
+  .live {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ok)
+  }
+
+  .live .dot {
+    background: var(--ok);
+    animation: pulse 1.6s infinite
+  }
+
+  .content {
+    padding: 26px 30px 60px;
+    animation: fadeUp .32s ease both
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 22px
+  }
+
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    padding: 18px;
+    box-shadow: var(--shadow)
+  }
+
+  .stat .k {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    display: flex;
+    align-items: center;
+    gap: 7px
+  }
+
+  .stat .v {
+    font-family: "Space Grotesk";
+    font-size: 30px;
+    font-weight: 700;
+    margin-top: 8px;
+    letter-spacing: -.02em
+  }
+
+  .stat .v small {
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 500
+  }
+
+  .stat .meta {
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-top: 3px
+  }
+
+  .stat .ic {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    margin-left: auto
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 20px
+  }
+
+  .panel-h {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--line)
+  }
+
+  .panel-h h3 {
+    font-size: 15px
+  }
+
+  .panel-h .sub {
+    font-size: 12px;
+    color: var(--muted)
+  }
+
+  .cols {
+    display: grid;
+    grid-template-columns: 1.55fr 1fr;
+    gap: 20px
+  }
+
+  /* ledger + lanes (signature) */
+  .lrow {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--line);
+    animation: fadeUp .3s ease both
+  }
+
+  .lrow:last-child {
+    border-bottom: none
+  }
+
+  .lrow-top {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 14px;
+    align-items: flex-start
+  }
+
+  .src .t {
+    font-weight: 600;
+    font-size: 13.5px
+  }
+
+  .src .d {
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-top: 3px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center
+  }
+
+  .tag {
+    font-size: 10.5px;
+    padding: 1px 7px;
+    border-radius: 5px;
+    font-weight: 600
+  }
+
+  .tag.j {
+    background: var(--jira-soft);
+    color: var(--jira-ink)
+  }
+
+  .tag.z {
+    background: var(--zoho-soft);
+    color: var(--zoho-ink)
+  }
+
+  .tag.p {
+    background: var(--brand-soft);
+    color: var(--brand-ink)
+  }
+
+  .lanes {
+    display: flex;
+    gap: 8px
+  }
+
+  .lane {
+    min-width: 120px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 7px 10px;
+    background: var(--surface-2)
+  }
+
+  .lane .lh {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .03em
+  }
+
+  .lane .lh .b {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700
+  }
+
+  .lane.j .b {
+    background: var(--jira)
+  }
+
+  .lane.z .b {
+    background: var(--zoho)
+  }
+
+  .lane .ls {
+    font-size: 10.5px;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 600
+  }
+
+  .lane .lid {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 2px
+  }
+
+  .hours-big {
+    font-family: "Space Grotesk";
+    font-weight: 700
+  }
+
+  /* approval pipeline stepper */
+  .pipe {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-top: 12px
+  }
+
+  .pnode {
+    display: flex;
+    align-items: center;
+    gap: 7px
+  }
+
+  .pdot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    flex: none;
+    font-size: 11px;
+    font-weight: 700;
+    background: #E7EAF0;
+    color: var(--muted);
+    border: 2px solid #E7EAF0
+  }
+
+  .pdot.done {
+    background: var(--ok);
+    border-color: var(--ok);
+    color: #fff
+  }
+
+  .pdot.cur {
+    background: #fff;
+    border-color: var(--brand);
+    color: var(--brand);
+    animation: ring 1.4s infinite
+  }
+
+  .pdot.no {
+    background: var(--no);
+    border-color: var(--no);
+    color: #fff
+  }
+
+  .plabel {
+    font-size: 11px;
+    font-weight: 600
+  }
+
+  .plabel .who2 {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 500
+  }
+
+  .pline {
+    height: 2px;
+    flex: 1;
+    min-width: 24px;
+    background: #E7EAF0;
+    margin: 0 8px
+  }
+
+  .pline.done {
+    background: var(--ok)
+  }
+
+  /* bars */
+  .barwrap {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    height: 150px;
+    padding: 14px 20px 6px
+  }
+
+  .bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    height: 100%;
+    justify-content: flex-end
+  }
+
+  .bar {
+    width: 100%;
+    max-width: 34px;
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    flex-direction: column-reverse;
+    transition: height .6s cubic-bezier(.2, .8, .2, 1);
+    min-height: 3px;
+    overflow: hidden
+  }
+
+  .bar .seg-j {
+    background: var(--jira)
+  }
+
+  .bar .seg-z {
+    background: var(--zoho);
+    opacity: .92
+  }
+
+  .bar-lbl {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 600
+  }
+
+  .bar-val {
+    font-size: 11px;
+    font-weight: 700;
+    font-family: "Space Grotesk"
+  }
+
+  .legend {
+    display: flex;
+    gap: 16px;
+    padding: 0 20px 16px;
+    font-size: 11.5px;
+    color: var(--muted)
+  }
+
+  .legend span {
+    display: flex;
+    align-items: center;
+    gap: 6px
+  }
+
+  .sw {
+    width: 11px;
+    height: 11px;
+    border-radius: 3px
+  }
+
+  /* forms */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: 20px
+  }
+
+  .form-grid .full {
+    grid-column: 1/-1
+  }
+
+  .form-grid label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-2);
+    margin-bottom: 6px
+  }
+
+  .form-grid input,
+  .form-grid select,
+  .form-grid textarea {
+    width: 100%;
+    padding: 11px 13px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--surface-2)
+  }
+
+  .form-grid input:focus,
+  .form-grid select:focus,
+  .form-grid textarea:focus {
+    outline: none;
+    border-color: var(--brand);
+    background: #fff;
+    box-shadow: 0 0 0 3px var(--brand-soft)
+  }
+
+  .form-grid textarea {
+    resize: vertical;
+    min-height: 72px
+  }
+
+  .form-foot {
+    padding: 16px 20px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface-2);
+    flex-wrap: wrap
+  }
+
+  .write-note {
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap
+  }
+
+  .timer {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 20px;
+    background: linear-gradient(120deg, #fff, var(--brand-soft));
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    margin-bottom: 20px;
+    box-shadow: var(--shadow)
+  }
+
+  .timer .clk {
+    font-family: "JetBrains Mono";
+    font-weight: 600;
+    font-size: 34px;
+    letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums
+  }
+
+  .timer .tinfo {
+    flex: 1
+  }
+
+  .timer .tinfo .t1 {
+    font-weight: 700;
+    font-family: "Space Grotesk";
+    font-size: 14px
+  }
+
+  .timer .tinfo .t2 {
+    font-size: 12px;
+    color: var(--muted)
+  }
+
+  .timer.running {
+    background: linear-gradient(120deg, #fff, var(--ok-soft));
+    border-color: #bfe6cd
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse
+  }
+
+  th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--muted);
+    font-weight: 700;
+    padding: 11px 20px;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface-2)
+  }
+
+  td {
+    padding: 13px 20px;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+    vertical-align: middle
+  }
+
+  tr:last-child td {
+    border-bottom: none
+  }
+
+  .empty {
+    padding: 48px 20px;
+    text-align: center;
+    color: var(--muted)
+  }
+
+  .empty svg {
+    width: 40px;
+    height: 40px;
+    opacity: .4;
+    margin-bottom: 10px
+  }
+
+  .mini {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600
+  }
+
+  .mini.ok {
+    background: var(--ok-soft);
+    color: #0d7a3c
+  }
+
+  .mini.ok:hover {
+    background: #d2f0dd
+  }
+
+  .mini.no {
+    background: var(--no-soft);
+    color: #b23232
+  }
+
+  .mini.no:hover {
+    background: #f7dada
+  }
+
+  .appr-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end
+  }
+
+  .uname {
+    display: flex;
+    align-items: center;
+    gap: 8px
+  }
+
+  #toaster {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 50
+  }
+
+  .toast {
+    background: var(--ink);
+    color: #fff;
+    padding: 13px 16px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    font-size: 13px;
+    max-width: 360px;
+    animation: fadeUp .3s ease both
+  }
+
+  .toast .ti {
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    display: grid;
+    place-items: center;
+    flex: none
+  }
+
+  .toast .tt {
+    font-weight: 600
+  }
+
+  .toast .tm {
+    font-size: 11.5px;
+    color: #aeb6c2
+  }
+
+  .menu-btn {
+    display: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    place-items: center
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px
+  }
+
+  @media(prefers-reduced-motion:reduce) {
+    * {
+      animation: none !important;
+      transition: none !important
+    }
+  }
+
+  @media(max-width:880px) {
+    #app-view {
+      grid-template-columns: 1fr
+    }
+
+    .sidebar {
+      position: fixed;
+      left: -270px;
+      z-index: 30;
+      transition: .25s;
+      box-shadow: var(--shadow-lg)
+    }
+
+    .sidebar.open {
+      left: 0
+    }
+
+    .menu-btn {
+      display: grid
+    }
+
+    .stat-grid {
+      grid-template-columns: 1fr 1fr
+    }
+
+    .cols {
+      grid-template-columns: 1fr
+    }
+
+    .form-grid {
+      grid-template-columns: 1fr
+    }
+
+    .content {
+      padding: 18px
+    }
+
+    .topbar {
+      padding: 13px 16px;
+      flex-wrap: wrap
+    }
+
+    .seg {
+      margin-left: 0;
+      order: 3;
+      width: 100%
+    }
+
+    .lanes {
+      flex-direction: column
+    }
+
+    .lrow-top {
+      grid-template-columns: 1fr
+    }
+  }
+</style>
+
+<!-- ============ LOGIN ============ -->
+<div id="login-view">
+  <div class="auth-card">
+    <div class="brand-mark">
+      <div class="logo"><svg viewBox="0 0 24 24" fill="none">
+          <path d="M4 12a8 8 0 0 1 13.5-5.8M20 12a8 8 0 0 1-13.5 5.8" stroke="#fff" stroke-width="2"
+            stroke-linecap="round" />
+          <path d="M17 3v4h-4M7 21v-4h4" stroke="#fff" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg></div>
+      <div>
+        <div class="brand-name">Unified Timesheet</div>
+        <div class="brand-sub">Jira × Zoho · single sign-on</div>
+      </div>
+    </div>
+    <h1>Sign in once.</h1>
+    <p class="lede">Log time a single time. It syncs to Jira and Zoho, then flows through your approval chain — TL, then
+      RM.</p>
+
+    <div class="idp-row" style="margin-bottom:18px">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="11" width="18" height="10" rx="2" stroke="#6B7486" stroke-width="2" />
+        <path d="M7 11V8a5 5 0 0 1 10 0v3" stroke="#6B7486" stroke-width="2" />
+      </svg>
+      SSO via your company IdP (Okta / Azure AD) · then we auto-connect both tools
+    </div>
+
+    <div class="field">
+      <label for="email">Corporate email</label>
+      <input id="email" type="email" placeholder="you@company.com" value="hardik.patel@onlinepsbloans.com"
+        autocomplete="email" />
+    </div>
+    <div id="sso-progress"></div>
+    <button class="btn btn-primary" style="width:100%" id="sso-btn" onclick="startSSO()">Continue with SSO</button>
+
+    <div class="or">OR SIGN IN AS</div>
+    <div class="who">PICK A PERSON — THE SAME PLATFORM, EVERY ROLE</div>
+    <div class="who-grid" id="who-grid"></div>
+  </div>
+</div>
+
+<!-- ============ AUTO-CONNECT ============ -->
+<div id="connect-view" class="hidden">
+  <div class="auth-card connect-card">
+    <div class="brand-mark">
+      <div class="logo"><svg viewBox="0 0 24 24" fill="none">
+          <path d="M4 12a8 8 0 0 1 13.5-5.8M20 12a8 8 0 0 1-13.5 5.8" stroke="#fff" stroke-width="2"
+            stroke-linecap="round" />
+          <path d="M17 3v4h-4M7 21v-4h4" stroke="#fff" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg></div>
+      <div>
+        <div class="brand-name">Connecting your tools</div>
+        <div class="brand-sub" id="conn-email">signed in</div>
+      </div>
+    </div>
+    <p class="lede">Your SSO identity already maps to both accounts — connecting automatically. No clicks needed.</p>
+
+    <div class="conn" id="conn-jira">
+      <div class="conn-ic j">J</div>
+      <div class="conn-meta"><strong>Atlassian Jira</strong><span>Worklog read &amp; write · REST API v3</span>
+        <div class="conn-scopes mono">write:jira-work · read:jira-work</div>
+      </div>
+      <div class="conn-state" id="state-jira"></div>
+    </div>
+    <div class="conn" id="conn-zoho">
+      <div class="conn-ic z">Z</div>
+      <div class="conn-meta"><strong>Zoho Projects</strong><span>Timesheet logs · API v1</span>
+        <div class="conn-scopes mono">ZohoProjects.timesheets.ALL</div>
+      </div>
+      <div class="conn-state" id="state-zoho"></div>
+    </div>
+
+    <div style="margin-top:6px;text-align:center">
+      <span style="font-size:11.5px;color:var(--muted)">Token expired or revoked? </span>
+      <button class="link" onclick="manualReconnect()">Reconnect manually</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app-view" class="hidden">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand-mark">
+      <div class="logo"><svg viewBox="0 0 24 24" fill="none">
+          <path d="M4 12a8 8 0 0 1 13.5-5.8M20 12a8 8 0 0 1-13.5 5.8" stroke="#fff" stroke-width="2"
+            stroke-linecap="round" />
+          <path d="M17 3v4h-4M7 21v-4h4" stroke="#fff" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg></div>
+      <div>
+        <div class="brand-name">Unified Timesheet Platform</div>
+        <div class="brand-sub">timesheet sync</div>
+      </div>
+    </div>
+    <div class="role-tag" id="role-tag"></div>
+    <nav id="nav"></nav>
+    <div class="side-user">
+      <div class="avatar" id="side-avatar">AR</div>
+      <div>
+        <div class="nm" id="side-name">Hardik Patel</div>
+        <div class="em" id="side-email">hardik.patel@onlinepsbloans.com</div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M4 6h16M4 12h16M4 18h16" stroke="#0F1320" stroke-width="2" stroke-linecap="round" />
+        </svg></button>
+      <div>
+        <h2 id="page-title">Dashboard</h2>
+        <div class="sub" id="page-sub"></div>
+      </div>
+      <div class="seg" id="role-switch"></div>
+      <span class="live"><span class="dot"></span>Live sync</span>
+    </header>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<div id="toaster"></div>
+
+<script>
+  /* =========================================================
+     Unified Timesheet Platform v2
+     SSO · auto-connect · dual real-time sync · role chain (Dev→TL→RM)
+     ========================================================= */
+
+  const USERS = [
+    { id: "u1", name: "Hardik Patel", email: "hardik.patel@onlinepsbloans.com", role: "developer", team: "Payments", initials: "AR", color: "--dev", reportsTo: "u3" },
+    { id: "u2", name: "kinjal Patel", email: "KinjalPatel@oplinnovate.com", role: "developer", team: "Payments", initials: "SC", color: "--jira", reportsTo: "u3" },
+    { id: "u3", name: "Nikul Patel", email: "nikul.patel@onlinepsbloans.com", role: "tl", team: "Payments", initials: "PN", color: "--tl" },
+    { id: "u4", name: "Niku Patel", email: "niku.patel@oplinnovate.com", role: "rm", team: "Engineering", initials: "MH", color: "--rm" },
+  ];
+  const ROLE = { developer: "Developer", tl: "Team Lead", rm: "Reporting Manager" };
+  const ROLE_COLOR = { developer: ["var(--dev)", "var(--brand-soft)"], tl: ["var(--tl)", "var(--tl-soft)"], rm: ["var(--rm)", "var(--rm-soft)"] };
+
+  const PROJECTS = [
+    { key: "PAY", name: "Payments Platform" },
+    { key: "WEB", name: "Web App" },
+    { key: "OPS", name: "Platform Ops" },
+  ];
+  const ISSUES = [
+    { jira: "PAY-142", zoho: "987654", project: "PAY", label: "Checkout API — payment retry logic" },
+    { jira: "PAY-118", zoho: "987201", project: "PAY", label: "Real-time sync indicators" },
+    { jira: "WEB-57", zoho: "991010", project: "WEB", label: "Dashboard performance pass" },
+    { jira: "PAY-160", zoho: "987889", project: "PAY", label: "SSO assertion validation" },
+    { jira: "OPS-9", zoho: "990455", project: "OPS", label: "CI pipeline hardening" },
+  ];
+
+  const State = {
+    currentUserId: "u1",
+    connected: { jira: false, zoho: false },
+    entries: [],
+    view: "dashboard",
+    timer: { running: false, start: 0, elapsed: 0, issue: "PAY-142", interval: null }
+  };
+  const me = () => USERS.find(u => u.id === State.currentUserId);
+  const userById = id => USERS.find(u => u.id === id);
+
+  /* ---- persistence (artifact storage, graceful fallback) ---- */
+  async function saveState() { try { if (window.storage) { await window.storage.set("utp2:entries", JSON.stringify(State.entries), false); } } catch (e) { } }
+  async function loadState() { try { if (window.storage) { const e = await window.storage.get("utp2:entries", false); if (e && e.value) State.entries = JSON.parse(e.value); } } catch (e) { } }
+
+  /* ---- helpers ---- */
+  const $ = s => document.querySelector(s);
+  const uid = () => Math.random().toString(36).slice(2, 8);
+  const fmtH = h => Number.isInteger(h) ? h : Number(h).toFixed(2);
+  const today = () => new Date().toISOString().slice(0, 10);
+  const clk = sec => { const h = String(Math.floor(sec / 3600)).padStart(2, "0"), m = String(Math.floor(sec % 3600 / 60)).padStart(2, "0"), s = String(sec % 60).padStart(2, "0"); return `${h}:${m}:${s}` };
+  const dayName = d => new Date(d + "T00:00:00").toLocaleDateString("en-US", { weekday: "short" });
+
+  function toast(title, msg, kind = "ok") {
+    const c = { ok: "var(--ok)", jira: "var(--jira)", zoho: "var(--zoho)", brand: "var(--brand)", no: "var(--no)" };
+    const t = document.createElement("div"); t.className = "toast";
+    t.innerHTML = `<div class="ti" style="background:${c[kind] || c.ok}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="tt">${title}</div><div class="tm">${msg}</div></div>`;
+    $("#toaster").appendChild(t);
+    setTimeout(() => { t.style.opacity = "0"; t.style.transform = "translateY(8px)"; setTimeout(() => t.remove(), 250) }, 3400);
+  }
+
+  /* ============ LOGIN ============ */
+  function renderWho() {
+    $("#who-grid").innerHTML = USERS.map(u => `
+    <button class="who-btn" onclick="quickLogin('${u.id}')">
+      <span class="avatar" style="background:linear-gradient(135deg,var(${u.color}),#8576F5)">${u.initials}</span>
+      <span><span class="nm">${u.name}</span><br><span class="rl">${ROLE[u.role]} · ${u.team}</span></span>
+    </button>`).join("");
+  }
+  function quickLogin(id) { State.currentUserId = id; $("#email").value = userById(id).email; startSSO(); }
+
+  function startSSO() {
+    const email = $("#email").value.trim();
+    if (!email || !email.includes("@")) { $("#email").focus(); return; }
+    const found = USERS.find(u => u.email === email);
+    if (found) State.currentUserId = found.id;
+    else { State.currentUserId = "u1"; me().email = email; } // unknown email → default developer identity
+    const btn = $("#sso-btn"); btn.disabled = true;
+    const steps = [["Redirecting to identity provider…", "Okta · SAML 2.0"],
+    ["Verifying credentials &amp; MFA…", "challenge accepted"],
+    ["Resolving Jira account &amp; Zoho user…", "matched to " + me().name],
+    ["Issuing signed session (JWT RS256)…", "role: " + ROLE[me().role]]];
+    let i = 0; const box = $("#sso-progress");
+    const tick = () => {
+      if (i < steps.length) {
+        box.innerHTML = `<div class="sso-status"><svg class="spin" width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#d6d2fb" stroke-width="3"/><path d="M21 12a9 9 0 0 0-9-9" stroke="var(--brand)" stroke-width="3" stroke-linecap="round"/></svg><div><strong>${steps[i][0]}</strong><div style="font-size:11px;opacity:.8">${steps[i][1]}</div></div></div>`;
+        i++; setTimeout(tick, 640);
+      } else { goConnect(); }
+    };
+    tick();
+  }
+
+  /* ============ AUTO-CONNECT (no clicks) ============ */
+  function goConnect() {
+    $("#conn-email").textContent = me().email + " · " + ROLE[me().role];
+    $("#login-view").classList.add("hidden");
+    $("#connect-view").classList.remove("hidden");
+    State.connected = { jira: false, zoho: false };
+    setLane("jira", "pending"); setLane("zoho", "pending");
+    // auto authorize, staggered — feels like two real OAuth round-trips
+    setTimeout(() => autoConn("jira"), 500);
+    setTimeout(() => autoConn("zoho"), 1500);
+  }
+  function setLane(p, s) {
+    const el = $("#state-" + p); const c = p === "jira" ? "var(--jira)" : "var(--zoho)";
+    if (s === "pending") el.innerHTML = `<span class="pill" style="background:var(--surface-2);color:var(--muted)"><span class="dot" style="background:var(--muted)"></span>Queued</span>`;
+    if (s === "connecting") el.innerHTML = `<span class="pill" style="background:var(--warn-soft);color:#9a6a14"><svg class="spin" width="11" height="11" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#eee" stroke-width="3"/><path d="M21 12a9 9 0 0 0-9-9" stroke="${c}" stroke-width="3" stroke-linecap="round"/></svg>Authorizing</span>`;
+    if (s === "done") el.innerHTML = `<span class="pill" style="background:var(--ok-soft);color:#0d7a3c"><span class="dot" style="background:var(--ok)"></span>Connected</span>`;
+  }
+  function autoConn(p) {
+    setLane(p, "connecting"); $("#conn-" + p).classList.add("done");
+    setTimeout(() => {
+      State.connected[p] = true; setLane(p, "done");
+      toast((p === "jira" ? "Jira" : "Zoho") + " connected", "OAuth token issued for " + me().name + " (encrypted)", p);
+      if (State.connected.jira && State.connected.zoho) setTimeout(enterApp, 750);
+    }, 800);
+  }
+  function manualReconnect() {
+    toast("Manual re-auth", "Opening provider consent screen…", "brand");
+    State.connected = { jira: false, zoho: false }; setLane("jira", "pending"); setLane("zoho", "pending");
+    setTimeout(() => autoConn("jira"), 400); setTimeout(() => autoConn("zoho"), 1300);
+  }
+
+  function enterApp() {
+    $("#connect-view").classList.add("hidden");
+    $("#app-view").classList.remove("hidden");
+    if (State.entries.length === 0) seedDemo();
+    buildShell(); nav("dashboard");
+  }
+
+  /* seed entries across users + approval stages so every role has work */
+  function seedDemo() {
+    const base = new Date();
+    const mk = (userId, daysAgo, h, idx, stage, synced = true) => {
+      const d = new Date(base); d.setDate(d.getDate() - daysAgo); const iss = ISSUES[idx];
+      return {
+        id: uid(), userId, date: d.toISOString().slice(0, 10), hours: h, desc: iss.label,
+        jira: iss.jira, zoho: iss.zoho, project: iss.project,
+        jiraStatus: synced ? "synced" : "pending", zohoStatus: synced ? "synced" : "pending",
+        jiraId: synced ? "10" + Math.floor(Math.random() * 9000 + 1000) : null,
+        zohoId: synced ? Math.floor(Math.random() * 900000 + 100000) + "" : null,
+        billable: true, stage
+      };
+    };
+    State.entries = [
+      mk("u1", 0, 2, 0, "submitted"),      // Alex → waiting TL (Priya)
+      mk("u1", 1, 3.5, 1, "tl_approved"),  // Alex → waiting RM (Marcus)
+      mk("u1", 2, 1.5, 3, "rm_approved"),  // Alex → fully approved
+      mk("u2", 0, 4, 2, "submitted"),      // Sam → waiting TL
+      mk("u2", 1, 2.5, 4, "tl_approved"),  // Sam → waiting RM
+      mk("u1", 3, 3, 1, "rm_approved"),
+    ];
+    saveState();
+  }
+
+  /* ============ SHELL / NAV ============ */
+  function buildShell() {
+    const u = me(); const [c, soft] = ROLE_COLOR[u.role];
+    $("#side-name").textContent = u.name; $("#side-email").textContent = u.email;
+    $("#side-avatar").textContent = u.initials;
+    $("#side-avatar").style.background = `linear-gradient(135deg,${c},#8576F5)`;
+    $("#role-tag").style.background = soft; $("#role-tag").style.color = c;
+    $("#role-tag").innerHTML = `<span class="dot" style="background:${c}"></span>${ROLE[u.role]} · ${u.team}`;
+
+    // role switcher
+    $("#role-switch").innerHTML = USERS.map(x => `<button class="${x.id === State.currentUserId ? 'on' : ''}" onclick="switchUser('${x.id}')" title="${x.name}">${ROLE[x.role].split(' ')[0] === 'Reporting' ? 'RM' : (x.role === 'tl' ? 'TL' : 'Dev')}·${x.initials}</button>`).join("");
+
+    // nav adapts to role
+    const items = [
+      { v: "dashboard", label: "Dashboard", ic: `<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>` },
+    ];
+    if (u.role === "developer") items.push({ v: "log", label: "Log time", ic: `<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>` });
+    items.push({ v: "timesheet", label: u.role === "developer" ? "My timesheet" : (u.role === "tl" ? "Team timesheet" : "All timesheets"), ic: `<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>` });
+    items.push({ v: "approvals", label: "Approvals", badge: true, ic: `<path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/>` });
+    items.push({ sep: true });
+    items.push({ v: "connections", label: "Connections", ic: `<path d="M8 7l-3 3a4 4 0 0 0 5.6 5.6L13 14M16 17l3-3a4 4 0 0 0-5.6-5.6L11 10"/>` });
+
+    $("#nav").innerHTML = items.map(it => it.sep ? `<div class="nav-sep"></div>` :
+      `<button class="nav-item ${it.v === State.view ? 'active' : ''}" data-view="${it.v}" onclick="nav('${it.v}')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${it.ic}</svg>
+      ${it.label}${it.badge ? `<span class="badge hidden" id="appr-badge">0</span>` : ""}
+    </button>`).join("");
+  }
+  function switchUser(id) {
+    State.currentUserId = id;
+    if (State.view === "log" && me().role !== "developer") State.view = "dashboard";
+    buildShell(); nav(State.view);
+    toast("Now acting as " + me().name, ROLE[me().role] + " · " + me().team, "brand");
+  }
+
+  const TITLES = {
+    dashboard: ["Dashboard", ""], log: ["Log time", "Write once — syncs to Jira and Zoho"],
+    timesheet: ["Timesheet", ""], approvals: ["Approvals", ""], connections: ["Connections", "Linked accounts and tokens"]
+  };
+  function nav(v) {
+    if (v === "log" && me().role !== "developer") v = "dashboard";
+    State.view = v;
+    document.querySelectorAll(".nav-item").forEach(n => n.classList.toggle("active", n.dataset.view === v));
+    $("#page-title").textContent = TITLES[v][0];
+    $("#page-sub").textContent = subFor(v);
+    $("#sidebar").classList.remove("open");
+    render();
+  }
+  function subFor(v) {
+    const u = me();
+    if (v === "dashboard") return u.role === "developer" ? "Your synced time and approval status" : (u.role === "tl" ? "Your team's time and pending approvals" : "Department time and final approvals");
+    if (v === "timesheet") return u.role === "developer" ? "Your entries and live sync" : (u.role === "tl" ? "Payments team entries" : "Everyone, all projects");
+    if (v === "approvals") return u.role === "developer" ? "Status of what you submitted" : (u.role === "tl" ? "Approve your team, then it goes to RM" : "Final approval — already cleared by TL");
+    return TITLES[v][1];
+  }
+
+  /* ============ RENDER ============ */
+  function render() {
+    // approval badge for current role
+    const n = actionable().length;
+    const badge = $("#appr-badge");
+    if (badge) { badge.textContent = n; badge.classList.toggle("hidden", n === 0); }
+    const c = $("#content");
+    if (State.view === "dashboard") c.innerHTML = viewDashboard();
+    else if (State.view === "log") c.innerHTML = viewLog();
+    else if (State.view === "timesheet") c.innerHTML = viewTimesheet();
+    else if (State.view === "approvals") c.innerHTML = viewApprovals();
+    else if (State.view === "connections") c.innerHTML = viewConnections();
+  }
+
+  /* which entries the current role can act on */
+  function actionable() {
+    const u = me();
+    if (u.role === "tl") return State.entries.filter(e => e.stage === "submitted" && userById(e.userId).reportsTo === u.id);
+    if (u.role === "rm") return State.entries.filter(e => e.stage === "tl_approved");
+    return []; // developer has no approval actions
+  }
+  /* entries visible to current role */
+  function visibleEntries() {
+    const u = me();
+    if (u.role === "developer") return State.entries.filter(e => e.userId === u.id);
+    if (u.role === "tl") return State.entries.filter(e => { const o = userById(e.userId); return o.team === u.team; });
+    return State.entries.slice(); // RM: all
+  }
+
+  function statusChip(s) {
+    if (s === "synced") return `<span style="color:var(--ok);font-weight:600"><span class="dot" style="display:inline-block;background:var(--ok)"></span> Synced</span>`;
+    if (s === "syncing") return `<span style="color:var(--warn);font-weight:600"><svg class="spin" width="11" height="11" viewBox="0 0 24 24" fill="none" style="vertical-align:-1px"><circle cx="12" cy="12" r="9" stroke="#eee" stroke-width="3"/><path d="M21 12a9 9 0 0 0-9-9" stroke="var(--warn)" stroke-width="3" stroke-linecap="round"/></svg> Syncing</span>`;
+    return `<span style="color:var(--muted);font-weight:600"><span class="dot" style="display:inline-block;background:var(--muted)"></span> Pending</span>`;
+  }
+  function laneHTML(kind, status, id) {
+    const isJ = kind === "j";
+    return `<div class="lane ${kind}"><div class="lh"><span class="b">${isJ ? "J" : "Z"}</span>${isJ ? "JIRA" : "ZOHO"}</div>
+    <div class="ls">${statusChip(status)}</div>
+    <div class="lid mono">${id ? (isJ ? "worklog #" + id : "log #" + id) : "—"}</div></div>`;
+  }
+
+  /* the approval pipeline stepper */
+  function pipeHTML(e) {
+    const rej = e.stage === "rejected";
+    const tlDone = ["tl_approved", "rm_approved"].includes(e.stage);
+    const rmDone = e.stage === "rm_approved";
+    const node = (state, label, who) => {
+      let cls = "pdot", inner = "";
+      if (state === "done") { cls += " done"; inner = "✓"; }
+      else if (state === "cur") { cls += " cur"; inner = "•"; }
+      else if (state === "no") { cls += " no"; inner = "✕"; }
+      else inner = "";
+      return `<div class="pnode"><div class="${cls}">${inner}</div><div class="plabel">${label}<div class="who2">${who}</div></div></div>`;
+    };
+    const tlState = rej && e.rejectStage === "tl" ? "no" : (tlDone ? "done" : "cur");
+    const rmState = rej && e.rejectStage === "rm" ? "no" : (rmDone ? "done" : (tlDone ? "cur" : "wait"));
+    return `<div class="pipe">
+    ${node("done", "Submitted", devName(e))}
+    <div class="pline ${tlDone || tlState === 'no' ? 'done' : ''}"></div>
+    ${node(tlState, "TL review", tlName(e))}
+    <div class="pline ${rmDone ? 'done' : ''}"></div>
+    ${node(rmState, "RM review", rmName())}
+  </div>`;
+  }
+  const devName = e => userById(e.userId).name.split(" ")[0];
+  const tlName = e => { const o = userById(e.userId); const tl = userById(o.reportsTo); return tl ? tl.name.split(" ")[0] : "TL"; };
+  const rmName = () => USERS.find(u => u.role === "rm").name.split(" ")[0];
+
+  /* ---------- DASHBOARD ---------- */
+  function viewDashboard() {
+    const u = me();
+    const vis = visibleEntries();
+    const wk = weekData(vis);
+    const wkH = wk.reduce((a, d) => a + d.h, 0);
+    const totalH = vis.reduce((a, e) => a + e.hours, 0);
+    const synced = vis.filter(e => e.jiraStatus === "synced" && e.zohoStatus === "synced").length;
+    const pct = vis.length ? Math.round(synced / vis.length * 100) : 100;
+    const pend = actionable().length;
+    const maxH = Math.max(8, ...wk.map(d => d.h));
+    const recent = [...vis].slice(-4).reverse();
+
+    const cards = u.role === "developer" ? `
+    <div class="stat"><div class="k">This week</div><div class="v">${fmtH(wkH)}<small>h</small></div><div class="meta">${wk.filter(d => d.h > 0).length} active days</div></div>
+    <div class="stat"><div class="k">Sync health <span class="ic" style="background:var(--ok-soft)"><span class="dot" style="background:var(--ok)"></span></span></div><div class="v">${pct}<small>%</small></div><div class="meta">${synced}/${vis.length} fully synced</div></div>
+    <div class="stat"><div class="k">Awaiting approval</div><div class="v">${vis.filter(e => e.stage === "submitted" || e.stage === "tl_approved").length}</div><div class="meta">in the TL → RM chain</div></div>
+    <div class="stat"><div class="k">Approved</div><div class="v">${vis.filter(e => e.stage === "rm_approved").length}</div><div class="meta">cleared by RM</div></div>`
+      : u.role === "tl" ? `
+    <div class="stat"><div class="k">Team hours / week</div><div class="v">${fmtH(wkH)}<small>h</small></div><div class="meta">${u.team} team</div></div>
+    <div class="stat"><div class="k">Pending your approval <span class="ic" style="background:var(--tl-soft)"><span class="dot" style="background:var(--tl)"></span></span></div><div class="v">${pend}</div><div class="meta">submitted by developers</div></div>
+    <div class="stat"><div class="k">Sent to RM</div><div class="v">${vis.filter(e => e.stage === "tl_approved").length}</div><div class="meta">you approved → awaiting RM</div></div>
+    <div class="stat"><div class="k">Sync health</div><div class="v">${pct}<small>%</small></div><div class="meta">team entries synced</div></div>`
+        : `
+    <div class="stat"><div class="k">Dept hours / week</div><div class="v">${fmtH(wkH)}<small>h</small></div><div class="meta">all teams</div></div>
+    <div class="stat"><div class="k">Final approval queue <span class="ic" style="background:var(--rm-soft)"><span class="dot" style="background:var(--rm)"></span></span></div><div class="v">${pend}</div><div class="meta">cleared by TL</div></div>
+    <div class="stat"><div class="k">Fully approved</div><div class="v">${vis.filter(e => e.stage === "rm_approved").length}</div><div class="meta">closed</div></div>
+    <div class="stat"><div class="k">Sync health</div><div class="v">${pct}<small>%</small></div><div class="meta">${synced}/${vis.length} entries</div></div>`;
+
+    return `<div class="stat-grid">${cards}</div>
+  <div class="cols">
+    <div class="panel" style="margin-bottom:0">
+      <div class="panel-h"><h3>${u.role === "developer" ? "Your recent entries" : "Recent team activity"}</h3><span class="sub">one source · two destinations · approval chain</span>
+        ${u.role === "developer" ? `<button class="btn btn-primary" style="margin-left:auto;padding:8px 14px" onclick="nav('log')">+ Log time</button>` : `<button class="btn btn-ghost" style="margin-left:auto;padding:8px 14px" onclick="nav('approvals')">Open approvals</button>`}</div>
+      <div>${recent.length ? recent.map(ledgerRow).join("") : emptyState("Nothing here yet", "No entries to show for this view.")}</div>
+    </div>
+    <div class="panel" style="margin-bottom:0">
+      <div class="panel-h"><h3>Hours this week</h3><span class="sub">Jira + Zoho mirror</span></div>
+      <div class="barwrap">${wk.map(d => {
+      const hpx = Math.round(d.h / maxH * 120);
+      return `<div class="bar-col"><div class="bar-val">${d.h ? fmtH(d.h) : ""}</div>
+        <div class="bar" style="height:${hpx}px"><div class="seg-j" style="height:50%"></div><div class="seg-z" style="height:50%"></div></div>
+        <div class="bar-lbl">${d.label}</div></div>`
+    }).join("")}</div>
+      <div class="legend"><span><span class="sw" style="background:var(--jira)"></span>Jira worklog</span><span><span class="sw" style="background:var(--zoho)"></span>Zoho timesheet</span></div>
+    </div>
+  </div>`;
+  }
+  function ledgerRow(e) {
+    const showWho = me().role !== "developer";
+    return `<div class="lrow"><div class="lrow-top">
+    <div class="src"><div class="t">${e.desc}</div>
+      <div class="d"><span class="hours-big">${fmtH(e.hours)}h</span>
+        <span class="tag j">${e.jira}</span><span class="tag z">${e.zoho}</span>
+        ${showWho ? `<span class="tag p">${userById(e.userId).name}</span>` : ""}
+        <span style="color:var(--muted)">${dayName(e.date)} ${e.date.slice(5)}</span></div></div>
+    <div class="lanes">${laneHTML("j", e.jiraStatus, e.jiraId)}${laneHTML("z", e.zohoStatus, e.zohoId)}</div>
+  </div>${pipeHTML(e)}</div>`;
+  }
+  function emptyState(t, m) { return `<div class="empty"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.6"/><path d="M8 12h8M8 16h5M8 8h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><div style="font-weight:600;color:var(--ink)">${t}</div><div style="font-size:12.5px">${m}</div></div>`; }
+  function weekData(list) {
+    const out = []; const base = new Date(); const dow = (base.getDay() + 6) % 7; const mon = new Date(base); mon.setDate(base.getDate() - dow);
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(mon); d.setDate(mon.getDate() + i); const ds = d.toISOString().slice(0, 10);
+      const h = list.filter(e => e.date === ds).reduce((a, e) => a + e.hours, 0); out.push({ label: ["M", "T", "W", "T", "F", "S", "S"][i], date: ds, h });
+    } return out;
+  }
+
+  /* ---------- LOG TIME (developer) ---------- */
+  function viewLog() {
+    const opts = ISSUES.map(i => `<option value="${i.jira}|${i.zoho}|${i.project}|${i.label}">${i.jira} — ${i.label}</option>`).join("");
+    const t = State.timer;
+    return `<div class="timer ${t.running ? 'running' : ''}" id="timer-box">
+    <div class="clk" id="timer-clock">${clk(t.running ? Math.floor((Date.now() - t.start) / 1000) + t.elapsed : t.elapsed)}</div>
+    <div class="tinfo"><div class="t1">${t.running ? "Tracking — " + t.issue : "Live timer"}</div>
+      <div class="t2">${t.running ? "running now · stop to log to both platforms" : "Start a live timer, or enter time manually below"}</div></div>
+    ${t.running ? `<button class="btn btn-ghost" onclick="stopTimer()">Stop &amp; review</button>` : `<button class="btn btn-primary" onclick="startTimer()">▶ Start timer</button>`}
+  </div>
+  <div class="panel" style="max-width:780px;margin-bottom:0">
+    <div class="panel-h"><h3>New time entry</h3><span class="sub">logging as ${me().name}</span></div>
+    <div class="form-grid">
+      <div><label>Task</label><select id="f-task">${opts}</select></div>
+      <div><label>Date</label><input id="f-date" type="date" value="${today()}"/></div>
+      <div><label>Hours</label><input id="f-hours" type="number" step="0.25" min="0.25" value="2"/></div>
+      <div><label>Billable</label><select id="f-bill"><option value="1">Billable</option><option value="0">Non-billable</option></select></div>
+      <div class="full"><label>Work description</label><textarea id="f-desc" placeholder="Synced to both the Jira comment and Zoho notes"></textarea></div>
+    </div>
+    <div class="form-foot">
+      <button class="btn btn-primary" onclick="submitEntry()" id="submit-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 0 1 13.5-5.8M20 12a8 8 0 0 1-13.5 5.8" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M17 3v4h-4M7 21v-4h4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Log &amp; push for approval</button>
+      <div class="write-note"><span class="tag j">Jira worklog</span><span class="tag z">Zoho log</span>
+        <span style="color:var(--muted)">synced now · then</span><span class="tag p">TL → RM</span></div>
+    </div>
+  </div>`;
+  }
+  function startTimer() {
+    const t = State.timer; const sel = $("#f-task"); t.issue = sel ? sel.value.split("|")[0] : "PAY-142";
+    t.running = true; t.start = Date.now();
+    t.interval = setInterval(() => { const el = $("#timer-clock"); if (el) el.textContent = clk(Math.floor((Date.now() - t.start) / 1000) + t.elapsed) }, 1000); render();
+  }
+  function stopTimer() {
+    const t = State.timer; t.elapsed += Math.floor((Date.now() - t.start) / 1000); t.running = false; clearInterval(t.interval);
+    const hrs = Math.max(0.25, Math.round(t.elapsed / 3600 * 4) / 4); render(); const hf = $("#f-hours"); if (hf) hf.value = hrs;
+    toast("Timer stopped", `${clk(t.elapsed)} ready to log (${hrs}h)`, "brand"); t.elapsed = 0;
+  }
+
+  function submitEntry() {
+    const v = $("#f-task").value.split("|"); const hours = parseFloat($("#f-hours").value);
+    if (!hours || hours <= 0) { $("#f-hours").focus(); return; }
+    const entry = {
+      id: uid(), userId: me().id, date: $("#f-date").value, hours,
+      desc: $("#f-desc").value.trim() || v[3], jira: v[0], zoho: v[1], project: v[2],
+      jiraStatus: "pending", zohoStatus: "pending", jiraId: null, zohoId: null,
+      billable: $("#f-bill").value === "1", stage: "submitted"
+    };
+    State.entries.push(entry);
+    toast("Logged & submitted", `${fmtH(hours)}h on ${entry.jira} — syncing + sent to ${tlName(entry)} (TL)`, "brand");
+    nav("timesheet"); syncEntry(entry.id);
+  }
+
+  /* ---------- real-time dual sync ---------- */
+  function syncEntry(id) {
+    const e = State.entries.find(x => x.id === id); if (!e) return;
+    e.jiraStatus = "syncing"; render();
+    setTimeout(() => {
+      e.jiraStatus = "synced"; e.jiraId = "10" + Math.floor(Math.random() * 9000 + 1000);
+      toast("Jira worklog created", "POST /rest/api/3/issue/" + e.jira + "/worklog", "jira"); render(); done(e);
+    }, 1100 + Math.random() * 600);
+    setTimeout(() => { e.zohoStatus = "syncing"; render(); }, 400);
+    setTimeout(() => {
+      e.zohoStatus = "synced"; e.zohoId = Math.floor(Math.random() * 900000 + 100000) + "";
+      toast("Zoho timesheet logged", "POST /api/v1/.../logs/ · " + e.zoho, "zoho"); render(); done(e);
+    }, 1700 + Math.random() * 700);
+  }
+  function done(e) {
+    if (e.jiraStatus === "synced" && e.zohoStatus === "synced") {
+      saveState();
+      setTimeout(() => toast("Fully synced", `${e.jira} consistent across Jira & Zoho`, "ok"), 300);
+    }
+  }
+
+  /* ---------- TIMESHEET ---------- */
+  function viewTimesheet() {
+    const rows = [...visibleEntries()].reverse();
+    if (!rows.length) return `<div class="panel" style="margin-bottom:0">${emptyState("Nothing logged yet", me().role === "developer" ? "Use Log time to create your first synced entry." : "No team entries to show.")}</div>`;
+    const showWho = me().role !== "developer";
+    return `<div class="panel" style="margin-bottom:0">
+    <div class="panel-h"><h3>${me().role === "developer" ? "Your entries" : me().role === "tl" ? "Team entries" : "All entries"}</h3><span class="sub">${rows.length} total · live sync + approval stage</span></div>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th>Date</th>${showWho ? "<th>Who</th>" : ""}<th>Task</th><th>Hours</th><th>Jira</th><th>Zoho</th><th>Stage</th></tr></thead>
+      <tbody>${rows.map(e => `<tr>
+        <td class="mono">${e.date.slice(5)}<div style="font-size:11px;color:var(--muted)">${dayName(e.date)}</div></td>
+        ${showWho ? `<td><div class="uname"><span class="avatar" style="width:24px;height:24px;font-size:10px;border-radius:6px;background:linear-gradient(135deg,var(${userById(e.userId).color}),#8576F5)">${userById(e.userId).initials}</span>${userById(e.userId).name.split(" ")[0]}</div></td>` : ""}
+        <td><div style="font-weight:600">${e.desc}</div><div style="margin-top:3px"><span class="tag j">${e.jira}</span> <span class="tag z">${e.zoho}</span></div></td>
+        <td class="mono hours-big">${fmtH(e.hours)}h</td>
+        <td>${statusChip(e.jiraStatus)}<div class="lid mono" style="margin-top:2px">${e.jiraId ? "#" + e.jiraId : ""}</div></td>
+        <td>${statusChip(e.zohoStatus)}<div class="lid mono" style="margin-top:2px">${e.zohoId ? "#" + e.zohoId : ""}</div></td>
+        <td>${stagePill(e)}</td></tr>`).join("")}</tbody>
+    </table></div></div>`;
+  }
+  function stagePill(e) {
+    if (e.stage === "submitted") return `<span class="pill" style="background:var(--warn-soft);color:#9a6a14">Awaiting TL</span>`;
+    if (e.stage === "tl_approved") return `<span class="pill" style="background:var(--rm-soft);color:#9a5a07">Awaiting RM</span>`;
+    if (e.stage === "rm_approved") return `<span class="pill" style="background:var(--ok-soft);color:#0d7a3c">Approved</span>`;
+    if (e.stage === "rejected") return `<span class="pill" style="background:var(--no-soft);color:#b23232">Rejected · ${e.rejectStage?.toUpperCase()}</span>`;
+    return "";
+  }
+
+  /* ---------- APPROVALS (role-aware) ---------- */
+  function viewApprovals() {
+    const u = me();
+    if (u.role === "developer") {
+      const mine = [...State.entries.filter(e => e.userId === u.id)].reverse();
+      return `<div class="panel" style="margin-bottom:0"><div class="panel-h"><h3>Your submissions</h3><span class="sub">push → TL → RM</span></div>
+      <div>${mine.length ? mine.map(e => `<div class="lrow"><div class="lrow-top"><div class="src"><div class="t">${e.desc}</div>
+        <div class="d"><span class="hours-big">${fmtH(e.hours)}h</span><span class="tag j">${e.jira}</span><span class="tag z">${e.zoho}</span><span style="color:var(--muted)">${dayName(e.date)} ${e.date.slice(5)}</span></div></div>
+        <div>${stagePill(e)}</div></div>${pipeHTML(e)}
+        ${e.stage === "rejected" ? `<button class="mini ok" style="margin-top:10px" onclick="resubmit('${e.id}')">Edit &amp; resubmit</button>` : ""}</div>`).join("") : emptyState("Nothing submitted", "Log time to start the approval chain.")}</div></div>`;
+    }
+    // TL / RM queue
+    const queue = actionable();
+    const stageLabel = u.role === "tl" ? "submitted by your team" : "already approved by TL";
+    return `<div class="panel" style="margin-bottom:0">
+    <div class="panel-h"><h3>${u.role === "tl" ? "Approve your team" : "Final approval"}</h3><span class="sub">${queue.length} ${stageLabel}</span></div>
+    ${queue.length ? `<div style="overflow-x:auto"><table>
+      <thead><tr><th>Date</th><th>Engineer</th><th>Task</th><th>Hours</th><th>Sync</th><th style="text-align:right">Decision</th></tr></thead>
+      <tbody>${queue.map(e => `<tr>
+        <td class="mono">${e.date.slice(5)}</td>
+        <td><div class="uname"><span class="avatar" style="width:26px;height:26px;font-size:11px;border-radius:7px;background:linear-gradient(135deg,var(${userById(e.userId).color}),#8576F5)">${userById(e.userId).initials}</span>${userById(e.userId).name}</div></td>
+        <td><div style="font-weight:600">${e.desc}</div><div style="margin-top:3px"><span class="tag j">${e.jira}</span> <span class="tag z">${e.zoho}</span> <span class="tag p">${e.project}</span></div></td>
+        <td class="mono hours-big">${fmtH(e.hours)}h</td>
+        <td>${(e.jiraStatus === "synced" && e.zohoStatus === "synced") ? '<span style="color:var(--ok);font-size:12px;font-weight:700">✓ both</span>' : '<span style="color:var(--warn);font-size:12px">syncing</span>'}</td>
+        <td><div class="appr-actions"><button class="mini ok" onclick="approve('${e.id}')">${u.role === "tl" ? "Approve → RM" : "Final approve"}</button><button class="mini no" onclick="reject('${e.id}')">Reject</button></div></td>
+      </tr>`).join("")}</tbody></table></div>` : emptyState("All caught up", "No timesheets waiting on you right now.")}
+  </div>`;
+  }
+  function approve(id) {
+    const e = State.entries.find(x => x.id === id); if (!e) return; const u = me();
+    if (u.role === "tl") { e.stage = "tl_approved"; toast("Approved by TL", `${e.jira} → sent to ${rmName()} (RM)`, "ok"); }
+    else if (u.role === "rm") { e.stage = "rm_approved"; toast("Final approval", `${e.jira} fully approved & closed`, "ok"); }
+    saveState(); render();
+  }
+  function reject(id) {
+    const e = State.entries.find(x => x.id === id); if (!e) return; const u = me();
+    e.stage = "rejected"; e.rejectStage = u.role;
+    toast("Rejected", `${e.jira} sent back to ${devName(e)}`, "no"); saveState(); render();
+  }
+  function resubmit(id) {
+    const e = State.entries.find(x => x.id === id); if (!e) return; e.stage = "submitted"; delete e.rejectStage;
+    toast("Resubmitted", `${e.jira} back in the chain → ${tlName(e)} (TL)`, "brand"); saveState(); render();
+  }
+
+  /* ---------- CONNECTIONS ---------- */
+  function viewConnections() {
+    const u = me();
+    return `<div class="cols">
+    <div class="panel" style="margin-bottom:0"><div class="panel-h"><h3>Identity</h3><span class="sub">single sign-on · current user</span></div>
+      <div style="padding:20px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <span class="avatar" style="width:46px;height:46px;border-radius:13px;font-size:17px;background:linear-gradient(135deg,var(${u.color}),#8576F5)">${u.initials}</span>
+          <div><div style="font-weight:700;font-family:'Space Grotesk';font-size:15px">${u.name}</div>
+          <div style="font-size:12.5px;color:var(--muted)">${u.email} · ${ROLE[u.role]}</div></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12.5px">
+          ${kv("Provider", "Okta · SAML 2.0")}${kv("Session", "JWT · RS256 · 1h")}
+          ${kv("Jira account", "557058:" + u.id + "a1b")}${kv("Zoho user", "6842" + u.id.slice(1) + "01")}
+          ${kv("Team", u.team)}${kv("Role", ROLE[u.role])}</div>
+      </div></div>
+    <div class="panel" style="margin-bottom:0"><div class="panel-h"><h3>Linked platforms</h3><span class="sub">auto-connected · OAuth 2.0</span></div>
+      <div style="padding:14px 20px">
+        <div class="conn done" style="margin-bottom:12px"><div class="conn-ic j">J</div><div class="conn-meta"><strong>Atlassian Jira</strong><span>token encrypted · AES-256-GCM</span></div><span class="pill" style="background:var(--ok-soft);color:#0d7a3c"><span class="dot" style="background:var(--ok)"></span>Active</span></div>
+        <div class="conn done"><div class="conn-ic z">Z</div><div class="conn-meta"><strong>Zoho Projects</strong><span>refresh token · 30d</span></div><span class="pill" style="background:var(--ok-soft);color:#0d7a3c"><span class="dot" style="background:var(--ok)"></span>Active</span></div>
+        <div style="margin-top:16px;font-size:11.5px;color:var(--muted);display:flex;gap:8px;align-items:flex-start">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="flex:none;margin-top:1px"><rect x="4" y="11" width="16" height="9" rx="2" stroke="var(--muted)" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="var(--muted)" stroke-width="2"/></svg>
+          Webhooks live both ways: <span class="mono">jira:worklog_updated</span> &amp; <span class="mono">TimeLog.update</span> stream back in real time.</div>
+      </div></div>
+  </div>`;
+  }
+  function kv(k, v) { return `<div style="background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:11px"><div style="color:var(--muted);font-size:11px">${k}</div><div class="mono" style="font-weight:600">${v}</div></div>`; }
+
+  /* ---------- boot ---------- */
+  renderWho();
+  (async () => { await loadState(); })();
+</script>
